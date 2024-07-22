@@ -1,0 +1,36 @@
+<launch>
+    <arg name="train_mode"              default="true"/>
+    <arg name="n_envs"                  default="2"/>
+    <arg name="n_count"                 default="0"/>
+    <arg name="is_single_loader"        default="false"/>
+    <arg name="tf_prefix"               default="r$(arg n_count)"/>
+    <arg name="gazebo_gui"              default="false"/>
+    <arg name="use_sim_time"            default="true"/>
+    <arg name="simulator"               default="flatland"  doc="opt: flatland, gazebo"/>
+    <arg name="use_rviz"                default="true"/>
+    <arg name="model"                   default="burger"/>
+    <arg name="x_pos"                   default="-2.0"/>
+    <arg name="y_pos"                   default="0.0"/>
+    <arg name="z_pos"                   default="0.0"/>
+    <arg name="map_dir"                 default="$(find simulator_loader)/maps"/>
+    <arg name="world_name"              default="$(find turtlebot3_gazebo)/worlds/turtlebot3_world.world"/>
+
+    <include file="$(find simulator_loader)/launch/single_loader.launch">
+        <arg name="train_mode"              default="$(arg train_mode)"/>
+        <arg name="is_single_loader"        default="false"/>
+        <arg name="n_envs"                  default="$(arg n_envs)"/>
+        <arg name="n_count"                 default="$(eval arg('n_count') + 1)"/>
+        <arg name="gazebo_gui"              default="false"/>
+        <arg name="use_sim_time"            default="true"/>
+        <arg name="simulator"               default="flatland"  doc="opt: flatland, gazebo"/>
+        <arg name="model"                   default="burger"/>
+        <arg name="x_pos"                   default="-2.0"/>
+        <arg name="y_pos"                   default="0.0"/>
+        <arg name="z_pos"                   default="0.0"/>
+        <arg name="use_rviz"                default="$(arg use_rviz)"/>
+        <arg name="map_dir"                 default="$(find simulator_loader)/maps"/>
+        <arg name="world_name"              default="$(find turtlebot3_gazebo)/worlds/turtlebot3_world.world"/>
+    </include>
+</launch>
+
+

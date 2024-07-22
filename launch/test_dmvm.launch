@@ -1,0 +1,16 @@
+<launch>
+    <arg name="map_frame"               default="r1/map"/>
+    <arg name="base_footprint_frame"    default="r1/base_footprint"/>
+    
+    <node pkg="data_map_visualize_manager" type="processor_manager_node" name="data_map_visualize_manager" output="screen" ns="r1">
+        <rosparam file="$(find data_map_visualize_manager)/params/test_footprint_data_map_params.yaml" command="load"/>
+    </node>
+
+    <!-- launch global planner -->
+    <node pkg="global_planner" type="planner" name="global_planner" ns="r1">
+        <rosparam file="$(find simulator_loader)/params/global_costmap_params.yaml" command="load"/>
+        <param name="~costmap/global_frame"  value="$(arg map_frame)"/>
+        <param name="~costmap/robot_base_frame"  value="$(arg base_footprint_frame)"/>
+        <remap from="global_planner/goal" to="goal"/>
+    </node>
+</launch>

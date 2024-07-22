@@ -1,0 +1,6 @@
+<launch>
+    <param name="robot_description" 
+            command="xacro --inorder '$(find simulator_loader)/urdf/turtlebot3_burger.gazebo.xacro'"/>
+    <node pkg="gazebo_ros" type="spawn_model" name="spawn"
+        args="-urdf -model turtlebot3_burger -x -2.0 -param robot_description" ns="r1"/>
+</launch>

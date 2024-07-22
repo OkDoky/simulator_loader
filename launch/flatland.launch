@@ -1,0 +1,48 @@
+<launch>
+    <arg name="update_rate"     default="100.0"/>
+    <arg name="step_size"       default="0.01"/>
+    <arg name="viz_pub_rate"    default="15.0"/>
+    <arg name="show_viz"        default="false"/>
+    <arg name="use_rviz"        default="true"/>
+    <arg name="map_dir"         default=""/>
+    <arg name="model"           default="burger"/>
+    <arg name="train_mode"      default="$(arg train_mode)" />
+    <arg name="tf_prefix"       default=""/>
+    <arg name="map_frame"               default="map"/>
+    <arg name="odom_frame"              default="odom"/>
+    <arg name="scan_frame"              default="base_scan"/>
+    <arg name="base_footprint_frame"    default="base_footprint"/>
+    <arg name="base_link_frame"         default="base_link"/>
+
+    <node pkg="tf2_ros" type="static_transform_publisher" name="map_to_$(arg tf_prefix)map_tf_broadcaster" args="0 0 0 0 0 0 map $(arg map_frame)" >
+        <remap from="/clock" to="/$(arg tf_prefix)/clock"/>
+    </node>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg tf_prefix)map_to_odom_tf_broadcaster" args="0 0 0 0 0 0 $(arg map_frame) $(arg odom_frame)" >
+        <remap from="/clock" to="/$(arg tf_prefix)/clock"/>
+    </node>
+
+    <node name="flatland_server"    pkg="flatland_server"   type="flatland_server"  output="screen">
+        <param name="world_path"        value="$(arg map_dir)/world.yaml"/>
+        <param name="update_rate"       value="$(arg update_rate)"/>
+        <param name="step_size"         value="$(arg step_size)"/>
+        <param name="show_viz"          value="$(arg show_viz)"/>
+        <param name="viz_pub_rate"      value="$(arg viz_pub_rate)"/>
+        <param name="train_mode"        value="$(arg train_mode)"/>
+        <remap from="scan"              to="/$(arg tf_prefix)/scan"/>
+        <remap from="odom"              to="/$(arg tf_prefix)/odom"/>
+        <remap from="cmd_vel"           to="/$(arg tf_prefix)/cmd_vel"/>
+        <remap from="twist"             to="/$(arg tf_prefix)/feedback_vel"/>
+        <remap from="/clock"            to="/$(arg tf_prefix)/clock"/>
+        <remap from="/step_world"       to="/$(arg tf_prefix)/step_world" />
+    </node>
+    <param name="odom_frame_id"         value="$(arg odom_frame)"/>
+    <param name="ground_truth_frame_id"         value="$(arg map_frame)"/>
+    <node name="spawn_$(arg tf_prefix)" pkg="rosservice" type="rosservice"
+        args="call --wait /$(arg tf_prefix)/spawn_model &quot;{
+            yaml_path: '$(find simulator_loader)/flatland/burger.yaml',
+            name: '$(arg tf_prefix)/$(arg model)',
+            ns: '/$(arg tf_prefix)/',
+            pose: {x: -2.0, y: 0.0, theta: 0.0}}&quot;"
+        >
+    </node>
+</launch>

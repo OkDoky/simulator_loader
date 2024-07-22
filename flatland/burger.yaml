@@ -1,0 +1,121 @@
+# omo_r1
+
+bodies:  # List of named bodies
+  - name: base_footprint
+    pose: [0, 0, 0] 
+    type: dynamic  
+    color: [0.5, 0.5, 0.5, 1.0] 
+    footprints:
+      - type: polygon 
+        points: [[-0.105, -0.105], [-0.105, 0.105], [0.105, 0.105], [0.105, -0.105]]
+        layers: ["all"]
+        collision: true
+        density: 1
+        friction: 0.1
+        restitution: 0
+        sensor: false
+
+  - name: base_link
+    pose: [0, 0, 0] 
+    type: dynamic  
+    color: [1, 0, 0, 0.75] 
+    footprints:
+      - type: polygon  # Laser model
+        # sensor: true
+        points: [[-0.105, -0.105], [-0.105, 0.105], [0.105, 0.105], [0.105, -0.105]]
+        # layers: ["static"]
+        density: 1
+        # collision: false
+
+joints:
+  - type: weld
+    name: base_link_weld
+    bodies: 
+      - name: base_footprint
+        anchor: [0, 0]
+      - name: base_link
+        anchor: [0, 0]
+
+
+plugins:
+    # required, specify DiffDrive type to load the plugin
+  - type: DiffDrive 
+
+    # required, name of the plugin
+    name: turtlebot_drive 
+
+    # required, body of a model to set velocities and obtain odometry
+    body: base_footprint
+
+    # optional, defaults to odom, the name of the odom frame
+    # odom_frame_id: odom
+    
+    # optional, defaults to "cmd_vel", the topic to subscribe for velocity
+    # commands
+    twist_sub: cmd_vel
+
+    # optional, defaults to "odometry/filtered", the topic to advertise for
+    # publish noisy odometry
+    odom_pub: odom  # topic odom is published on
+
+    # optional, defaults to "twist", the topic to publish noisy local frame velocity
+    # that simulates encoder readings
+    twist_pub: feedback_vel
+    
+    # optional, defaults to inf, rate to publish odometry at, in Hz
+    pub_rate: 50
+
+    # optional, defaults to true, enables the advertising and publishing of both
+    # ground truth and noisy odometry
+    enable_odom_pub: true
+
+    # optional, defaults to true, enables the publishing of the TF between
+    # 'base_link' (or link specified in "body") and 'odom' links.
+    # Disable if your code has its own TF publisher for these two links.
+    # enable_odom_tf_pub: true
+
+    # optional, defaults to true, enables the advertising and publishing of noisy local
+    # frame velocity
+    enable_twist_pub: true
+
+    # optional, defaults to [0, 0, 0], corresponds to noise on [x, y, yaw],
+    # the variances of gaussian noise to apply to the pose components of the
+    # odometry message
+    odom_pose_noise: [0.0, 0.0, 0.0]
+
+    # optional, defaults to [0, 0, 0], corresponds to noise on
+    # [x velocity, y velocity, yaw rate], the variances of gaussian noise to
+    # apply to the twist components of the odometry message
+    odom_twist_noise: [0, 0, 0]
+
+    # optional, defaults each parameter to 0.0 which means "no limit"
+    # sets dynamics constraints on angular velocity, acceleration (in rads/sec; rads/sec/sec)
+    angular_dynamics:
+      acceleration_limit: 0.0   # max acceleration (away from 0), in rads/s/s; 0.0 means "no limit"
+      deceleration_limit: 0.0   # max deceleration (towards 0), in rads/s/s; 0.0 means "no limit"; left blank, will default to acceleration_limit value
+      velocity_limit: 0.7       # max absolute velocity in rads/s; 0.0 means "no limit"
+
+    # optional, defaults each parameter to 0.0 which means "no limit"
+    # sets dynamics constraints on linear velocity, acceleration (in m/s; m/s/s)
+    linear_dynamics:
+      acceleration_limit: 0.0   # max acceleration (away from 0), in m/s/s; 0.0 means "no limit"
+      deceleration_limit: 0.0   # max deceleration (towards 0), in m/s/s; 0.0 means "no limit"; left blank, will default to acceleration_limit value
+      velocity_limit: 1.0       # max absolute velocity in m/s; 0.0 means "no limit"
+
+    # ground_truth_frame_id: map  # The name of the ground truth origin TF frame
+
+  - type: Laser
+    name: base_scan
+    frame: base_scan
+    topic: scan
+    body: base_link
+    broadcast_tf: true
+    origin: [0.0, 0.0, 0.0]
+    range: 10
+    angle: {min: -3.14159265359, max: 3.14159265359, increment: 0.004363323129985824}
+    noise_std_dev: 0.015
+    update_rate: 15
+
+  - type: ModelTfPublisher
+    name: tf_publisher
+    publish_tf_world: false
