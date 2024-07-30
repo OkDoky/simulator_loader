@@ -6,23 +6,28 @@
     <arg name="use_rviz"        default="true"/>
     <arg name="map_dir"         default=""/>
     <arg name="model"           default="burger"/>
-    <arg name="train_mode"      default="$(arg train_mode)" />
+    <arg name="train_mode"      default="false" />
+    <arg name="eval_mode"       default="false" />
     <arg name="tf_prefix"       default=""/>
     <arg name="map_frame"               default="map"/>
     <arg name="odom_frame"              default="odom"/>
     <arg name="scan_frame"              default="base_scan"/>
     <arg name="base_footprint_frame"    default="base_footprint"/>
     <arg name="base_link_frame"         default="base_link"/>
+    <arg name="x_pos"                   default="0.0"/>
+    <arg name="y_pos"                   default="0.0"/>
+    <arg name="theta_pos"               default="0.0"/>
 
-    <node pkg="tf2_ros" type="static_transform_publisher" name="map_to_$(arg tf_prefix)map_tf_broadcaster" args="0 0 0 0 0 0 map $(arg map_frame)" >
+    <node pkg="tf2_ros" type="static_transform_publisher" name="global_map_tf_broadcaster" args="0 0 0 0 0 0 map $(arg map_frame)" >
         <remap from="/clock" to="/$(arg tf_prefix)/clock"/>
     </node>
-    <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg tf_prefix)map_to_odom_tf_broadcaster" args="0 0 0 0 0 0 $(arg map_frame) $(arg odom_frame)" >
+    <node pkg="tf2_ros" type="static_transform_publisher" name="map_to_odom_tf_broadcaster" args="0 0 0 0 0 0 $(arg map_frame) $(arg odom_frame)" >
         <remap from="/clock" to="/$(arg tf_prefix)/clock"/>
     </node>
 
     <node name="flatland_server"    pkg="flatland_server"   type="flatland_server"  output="screen">
         <param name="world_path"        value="$(arg map_dir)/world.yaml"/>
+        <param name="map_file"          value="$(arg map_dir)/map.yaml"/>
         <param name="update_rate"       value="$(arg update_rate)"/>
         <param name="step_size"         value="$(arg step_size)"/>
         <param name="show_viz"          value="$(arg show_viz)"/>
@@ -42,7 +47,7 @@
             yaml_path: '$(find simulator_loader)/flatland/burger.yaml',
             name: '$(arg tf_prefix)/$(arg model)',
             ns: '/$(arg tf_prefix)/',
-            pose: {x: -2.0, y: 0.0, theta: 0.0}}&quot;"
+            pose: {x: $(arg x_pos), y: $(arg y_pos), theta: $(arg theta_pos)}}&quot;"
         >
     </node>
 </launch>

@@ -9,7 +9,6 @@ Panels:
         - /TF1/Tree1
         - /r11
         - /r11/DataMap1
-        - /r11/DataMap1/Planner1
       Splitter Ratio: 0.4333333373069763
     Tree Height: 618
   - Class: rviz/Selection
@@ -18,6 +17,7 @@ Panels:
     Expanded:
       - /2D Pose Estimate1
       - /2D Nav Goal1
+      - /Publish Point1
     Name: Tool Properties
     Splitter Ratio: 0.5886790156364441
   - Class: rviz/Views
@@ -28,7 +28,7 @@ Panels:
   - Class: rviz/Time
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: LaserScan
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -71,34 +71,12 @@ Visualization Manager:
       Value: false
       Visual Enabled: true
     - Class: rviz/TF
-      Enabled: true
+      Enabled: false
       Filter (blacklist): ""
       Filter (whitelist): ""
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        map:
-          Value: true
-        r1/base_footprint:
-          Value: true
-        r1/base_link:
-          Value: true
-        r1/base_scan:
-          Value: true
-        r1/map:
-          Value: true
-        r1/odom:
-          Value: true
-        r2/base_footprint:
-          Value: true
-        r2/base_link:
-          Value: true
-        r2/base_scan:
-          Value: true
-        r2/map:
-          Value: true
-        r2/odom:
-          Value: true
       Marker Alpha: 1
       Marker Scale: 1
       Name: TF
@@ -106,21 +84,9 @@ Visualization Manager:
       Show Axes: true
       Show Names: false
       Tree:
-        map:
-          r1/map:
-            r1/odom:
-              r1/base_footprint:
-                r1/base_link:
-                  r1/base_scan:
-                    {}
-          r2/map:
-            r2/odom:
-              r2/base_footprint:
-                r2/base_link:
-                  r2/base_scan:
-                    {}
+        {}
       Update Interval: 0
-      Value: true
+      Value: false
     - Alpha: 0.699999988079071
       Class: rviz/Map
       Color Scheme: map
@@ -186,7 +152,7 @@ Visualization Manager:
               Buffer Length: 1
               Class: rviz/Path
               Color: 255; 255; 0
-              Enabled: true
+              Enabled: false
               Head Diameter: 0.30000001192092896
               Head Length: 0.20000000298023224
               Length: 0.30000001192092896
@@ -205,7 +171,7 @@ Visualization Manager:
               Shaft Length: 0.10000000149011612
               Topic: /r1/global_planner/planner/plan
               Unreliable: false
-              Value: true
+              Value: false
           Enabled: true
           Name: DataMap
         - Alpha: 1
@@ -254,11 +220,22 @@ Visualization Manager:
       Class: rviz/Map
       Color Scheme: costmap
       Draw Behind: false
-      Enabled: true
+      Enabled: false
       Name: Map
       Topic: /r2/dmvm/combined_data_map
       Unreliable: false
       Use Timestamp: false
+      Value: false
+    - Alpha: 1
+      Class: rviz/PointStamped
+      Color: 204; 41; 204
+      Enabled: true
+      History Length: 2
+      Name: PointStamped
+      Queue Size: 10
+      Radius: 0.20000000298023224
+      Topic: /clicked_point
+      Unreliable: false
       Value: true
   Enabled: true
   Global Options:
@@ -280,10 +257,13 @@ Visualization Manager:
     - Class: rviz/SetGoal
       Topic: /r1/goal
     - Class: rviz/Measure
+    - Class: rviz/PublishPoint
+      Single click: true
+      Topic: /clicked_point
   Value: true
   Views:
     Current:
-      Angle: -1.5657963752746582
+      Angle: 0.009203212335705757
       Class: rviz/TopDownOrtho
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
@@ -293,10 +273,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 97.49784088134766
+      Scale: 27.153242111206055
       Target Frame: <Fixed Frame>
-      X: -0.974122166633606
-      Y: 0.03401194512844086
+      X: 4.974185943603516
+      Y: 6.8642964363098145
     Saved: ~
 Window Geometry:
   Displays:

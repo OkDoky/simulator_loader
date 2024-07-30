@@ -1,5 +1,5 @@
 <launch>
-    <arg name="train_mode"              default="true"/>
+    <arg name="eval_mode"               default="true"/>
     <arg name="n_envs"                  default="2"/>
     <arg name="n_count"                 default="0"/>
     <arg name="is_single_loader"        default="false"/>
@@ -17,8 +17,8 @@
     <param name="/use_sim_time"         value="$(arg use_sim_time)"/>
     <param name="/n_envs"               value="$(arg n_envs)"/>
     
-    <include file="$(find simulator_loader)/launch/single_loader.launch">
-        <arg name="train_mode"              default="$(arg train_mode)"/>
+    <include file="$(find simulator_loader)/launch/eval_single_loader.launch">
+        <arg name="eval_mode"               default="$(arg eval_mode)"/>
         <arg name="is_single_loader"        default="$(arg is_single_loader)"/>
         <arg name="n_envs"                  default="$(arg n_envs)"/>
         <arg name="n_count"                 default="$(eval arg('n_count') + 1)"/>

@@ -1,5 +1,5 @@
 <launch>
-    <arg name="train_mode"              default="false"/>
+    <arg name="eval_mode"               default="false"/>
     <arg name="is_single_loader"        default="true"/>
     <arg name="n_envs"                  default="1"/>
     <arg name="n_count"                 default="1"/>
@@ -15,66 +15,8 @@
     <arg name="map_dir"                 default="$(find simulator_loader)/maps"/>
     <arg name="world_name"              default="$(find turtlebot3_gazebo)/worlds/turtlebot3_world.world"/>
 
-    <group if="$(eval is_single_loader == true)">
-        <arg name="map_frame"               default="map"/>
-        <arg name="odom_frame"              default="odom"/>
-        <arg name="scan_frame"              default="base_scan"/>
-        <arg name="base_footprint_frame"    default="base_footprint"/>
-        <arg name="base_link_frame"         default="base_link"/>
-        
-        <!-- gazebo loader -->
-        <group if="$(eval simulator == 'gazebo')">
-            <include file="$(find gazebo_ros)/launch/empty_world.launch">
-                <arg name="world_name" value="$(arg world_name)"/>
-                <arg name="paused" value="false"/>
-                <arg name="use_sim_time" value="$(arg use_sim_time)"/>
-                <arg name="gui" value="$(arg gazebo_gui)"/>
-                <arg name="headless" value="false"/>
-                <arg name="debug" value="false"/>
-            </include>
-            <!-- load model -->
-            <param name="robot_description" 
-                command="xacro --inorder '$(find simulator_loader)/urdf/turtlebot3_$(arg model).gazebo.xacro' map_frame:=$(arg map_frame) base_footprint_frame:=$(arg base_footprint_frame) base_link_frame:=$(arg base_link_frame) odom_frame:=$(arg odom_frame) scan_frame:=$(arg scan_frame)"/>
-            <node pkg="gazebo_ros" type="spawn_model" name="spawn_urdf"  
-                args="-urdf -model turtlebot3_$(arg model) -x $(arg x_pos) -y $(arg y_pos) -Y $(arg theta_pos) -param robot_description" />
-        </group>
-
-        <group if="$(eval simulator == 'flatland')">
-            <include file="$(find simulator_loader)/launch/flatland.launch">
-                <arg name="map_dir"        default="$(arg map_dir)"/>
-                <arg name="update_rate"    default="10.0"/>
-                <arg name="step_size"      default="0.1"/>
-                <arg name="viz_pub_rate"   default="10.0"/>
-                <arg name="model"          default="$(arg model)"/>
-                <arg name="train_mode"     default="true"/>
-                <arg name="tf_prefix"      default=""/>
-                <arg name="map_frame"               default="$(arg map_frame)"/>
-                <arg name="odom_frame"              default="$(arg odom_frame)"/>
-                <arg name="scan_frame"              default="$(arg scan_frame)"/>
-                <arg name="base_footprint_frame"    default="$(arg base_footprint_frame)"/>
-                <arg name="base_link_frame"         default="$(arg base_link_frame)"/>
-                <arg name="x_pos"                   default="$(arg x_pos)"/>
-                <arg name="y_pos"                   default="$(arg y_pos)"/>
-                <arg name="theta_pos"               default="$(arg theta_pos)"/>
-            </include>
-        </group>
-
-        <!-- Map server -->
-        <node pkg="map_server" name="map_server" type="map_server" args="$(arg map_dir)/map.yaml">
-            <param name="frame_id"      value="$(arg map_frame)"/>
-        </node>
-
-        <!-- fake localization -->
-        <node pkg="fake_localization" type="fake_localization" name="fake_localization" output="screen">
-            <param name="odom_frame_id"             value="$(arg odom_frame)"/>
-            <param name="global_frame_id"           value="$(arg map_frame)"/>
-            <param name="base_frame_id"             value="$(arg base_footprint_frame)"/>
-            <remap from="base_pose_ground_truth"    to="odom"/>
-        </node>
-    </group>
-
     <!-- for multi robot system -->
-    <group if="$(eval is_single_loader == false)" ns="$(arg tf_prefix)">
+    <group ns="$(arg tf_prefix)">
         <arg name="map_frame"               default="$(arg tf_prefix)/map"/>
         <arg name="odom_frame"              default="$(arg tf_prefix)/odom"/>
         <arg name="scan_frame"              default="$(arg tf_prefix)/base_scan"/>
@@ -108,7 +50,7 @@
                 <arg name="step_size"      default="0.1"/>
                 <arg name="viz_pub_rate"   default="10.0"/>
                 <arg name="model"          default="$(arg model)"/>
-                <arg name="train_mode"     default="true"/>
+                <arg name="eval_mode"      default="true"/>
                 <arg name="tf_prefix"      default="$(arg tf_prefix)"/>
                 <arg name="map_frame"               default="$(arg map_frame)"/>
                 <arg name="odom_frame"              default="$(arg odom_frame)"/>
@@ -133,15 +75,6 @@
             <param name="global_frame_id"           value="$(arg map_frame)"/>
             <param name="base_frame_id"             value="$(arg base_footprint_frame)"/>
             <remap from="base_pose_ground_truth"    to="odom"/>
-            <remap from="/clock"                    to="$(arg ns_clock)"/>
-        </node>
-        
-        <!-- launch global planner -->
-        <node pkg="global_planner" type="planner" name="global_planner">
-            <rosparam file="$(find simulator_loader)/params/global_costmap_params.yaml" command="load"/>
-            <param name="~costmap/global_frame"     value="$(arg map_frame)"/>
-            <param name="~costmap/robot_base_frame" value="$(arg base_footprint_frame)"/>
-            <remap from="global_planner/goal"       to="goal"/>
             <remap from="/clock"                    to="$(arg ns_clock)"/>
         </node>
 
@@ -174,8 +107,8 @@
     </group>
 
     <!-- recurrent launch single loader -->
-    <include file="$(find simulator_loader)/launch/single_loader.launch" if="$(eval n_envs > n_count and is_single_loader == false)">
-        <arg name="train_mode"          value="$(arg train_mode)"/>
+    <include file="$(find simulator_loader)/launch/eval_single_loader.launch" if="$(eval n_envs > n_count and is_single_loader == false)">
+        <arg name="eval_mode"           value="$(arg eval_mode)"/>
         <arg name="is_single_loader"    value="false"/>
         <arg name="n_envs"              value="$(arg n_envs)"/>
         <arg name="n_count"             value="$(eval arg('n_count') + 1)"/>
@@ -192,7 +125,7 @@
     </include>
 
     <!-- train node -->
-    <group if="$(eval (n_envs == n_count) and (train_mode == true))">
-        <node pkg="simulator_loader" type="drqn.bash" name="train_drqn" output="screen"/>
+    <group if="$(eval (n_envs == n_count) and (eval_mode == true))">
+        <node pkg="simulator_loader" type="eval_drqn_nav.bash" name="train_drqn" output="screen"/>
     </group>
 </launch>
