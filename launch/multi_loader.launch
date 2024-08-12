@@ -2,6 +2,7 @@
     <arg name="train_mode"              default="true"/>
     <arg name="n_envs"                  default="2"/>
     <arg name="n_count"                 default="0"/>
+    <arg name="total_timesteps"         default="1000000"/>
     <arg name="is_single_loader"        default="false"/>
     <arg name="tf_prefix"               default="r$(arg n_count)"/>
     <arg name="gazebo_gui"              default="false"/>
@@ -16,6 +17,7 @@
     <arg name="world_name"              default="$(find turtlebot3_gazebo)/worlds/turtlebot3_world.world"/>
     <param name="/use_sim_time"         value="$(arg use_sim_time)"/>
     <param name="/n_envs"               value="$(arg n_envs)"/>
+    <param name="/total_timesteps"      value="$(arg total_timesteps)"/>
     
     <include file="$(find simulator_loader)/launch/single_loader.launch">
         <arg name="train_mode"              default="$(arg train_mode)"/>

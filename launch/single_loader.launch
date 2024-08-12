@@ -156,7 +156,7 @@
         <node pkg="astar_ros" type="astar_ros" name="pedsim_planner" output="screen">    
             <param name="Euclidean"                 value="true"/>
             <param name="OccupyThresh"              value="-1"/>
-            <param name="InflateRadius"             value="0.7"/>
+            <param name="InflateRadius"             value="0.305"/>
             <param name="map_frame"                 value="$(arg map_frame)"/>
             <remap from="/clock"                    to="$(arg ns_clock)"/>
         </node>
